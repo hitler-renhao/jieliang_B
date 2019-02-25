@@ -1,5 +1,5 @@
 {
-  "name": "jieliang",
+  "name": "jieliang_b",
   "version": "1.0.0",
   "description": "A Vue.js project",
   "author": "hitler-renhao <39614457+hitler-renhao@users.noreply.github.com>",
@@ -63,5 +63,15 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "main": ".postcssrc.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hitler-renhao/jieliang_B.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hitler-renhao/jieliang_B/issues"
+  },
+  "homepage": "https://github.com/hitler-renhao/jieliang_B#readme"
 }

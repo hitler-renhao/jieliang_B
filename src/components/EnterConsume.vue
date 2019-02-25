@@ -1,12 +1,10 @@
 <template>
-  <div class="Login">
+  <div class="EnterConsume">
     <div class="main">
-      <div class="entering">
-        <input v-model="phone" type="text" class="phone" placeholder="用户名">
-        <input v-model="password" type="text" class="password" placeholder="密码">
-        <button @click="Login">登&nbsp;&nbsp;&nbsp;&nbsp;录</button>
-      </div>
-
+      <input v-model="phone" type="text" class="phone" placeholder="请输入手机号">
+      <p class="getSms" @click="getSms">获取验证码</p>
+      <input v-model="smsCode" type="text" class="smsCode" placeholder="请输入验证码">
+      <button @click="Login">验证</button>
     </div>
 
   </div>
@@ -14,11 +12,11 @@
 
 <script>
   export default {
-    name: 'Login',
+    name: 'EnterConsume',
     data() {
       return {
         phone: '',
-        password: ''
+        smsCode: ''
       }
     },
     methods: {
@@ -56,50 +54,52 @@
   .Login {
     width: 100%;
     height: 100vh;
-    background: url(../assets/img/login-bg.png) no-repeat;
-    background-size: 100% 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background: url(../assets/img/login-bg.png);
+    background-size: 100%;
   }
 
   .main {
-    width: 22.4%;
-    height: 66.7%;
-    background: url(../assets/img/login.png) no-repeat;
-    background-size: 100%;
-    background-position: center center;
+    position: absolute;
+    top: 55vh;
+    left: 6vh;
   }
 
-  .entering {
-    position: absolute;
-    top: 55%;
-    left: 50%;
-    transform: translate(-50%);
-  }
   input {
-    display: block;
     width: 240px;
-    height: 40px;
-    border-radius: 20px;
+    height: 20px;
+    margin: 3vh 0;
     border: none;
+    border-bottom: 1px solid #ccc;
+    font-size: 12px;
+    line-height: 38px;
     outline: none;
-    text-align: center;
-    margin-bottom: 30px;
   }
-  ::-webkit-input-placeholder {
-    color: #ddd;
-  }
-  button {
-    width: 120px;
-    height: 36px;
-    border-radius: 18px;
-    background-color: #fff;
-    color: #5CB09B;
+
+  .getSms {
     position: absolute;
-    left: 50%;
-    transform: translate(-50%);
+    top: 3vh;
+    right: 15vh;
     font-size: 14px;
+    color: #EC7474;
+  }
+
+  button {
+    position: absolute;
+    bottom: -15vh;
+    right: 5vh;
+    width: 150px;
+    height: 50px;
+    border-radius: 25px;
+    border: none;
+    background-color: #fff;
+    box-shadow: 0px -1px 2px 0px rgba(254, 178, 0, 0.39),
+      /*上边阴影*/
+      -1px 0px 2px 0px rgba(254, 178, 0, 0.39),
+      /*左边阴影*/
+      1px 0px 2px 0px rgba(254, 178, 0, 0.39),
+      /*右边阴影*/
+      0px 1px 2px 0px rgba(254, 178, 0, 0.39);
+    /*下边阴影*/
   }
 
 </style>
