@@ -19,8 +19,8 @@
         <div class="birthday">
           <i>性别 :</i>
           <div class="radios">
-            <el-radio v-model="radio" label="男">男</el-radio>
-            <el-radio v-model="radio" label="女">女</el-radio>
+            <el-radio v-model="radio" label="1">男</el-radio>
+            <el-radio v-model="radio" label="2">女</el-radio>
           </div>
         </div>
         <div class="btn">
@@ -44,9 +44,8 @@
         userName: '',
         phone: '',
         date: '',
-        radio: '男',
+        radio: '1',
         type: '',
-        userId: ''
       }
     },
     created() {
@@ -54,7 +53,7 @@
       this.userId = this.$route.query.userId
       console.log(this.type);
       console.log(this.userId);
-      
+
       if (this.type == 'edit') {
         // this.http.post('/123', {
         //   userId: this.userId
@@ -71,9 +70,50 @@
     },
     methods: {
       success() {
-        alert('姓名_____' + this.userName + '\n手机号_____' + this.phone + '\n生日_____' + this.date + '\n性别_____' + this.radio)
-        var newDate = new Date(this.date)
-        alert(newDate.getFullYear() + '-' + (newDate.getMonth() + 1) + '-' + newDate.getDate())
+        var pattern = /^(((13[0-9]{1})|(14[0-9]{1})|(15[0-9]{1})|(16[0-9]{1})|(17[0-9]{1})|(18[0-9]{1})|(19[0-9]{1}))+\d{8})$/;
+        console.log(this.userName);
+        console.log(this.phone);
+        console.log(this.radio);
+        
+        if (!this.userName || !this.phone || !this.radio) {
+          this.$message({
+            message: '请将信息填写完整!',
+            type: 'error'
+          });
+        } else if (!pattern.test(this.phone)) {
+          this.$message({
+            message: '手机号填写有误!',
+            type: 'error'
+          });
+        } else {
+          var newDate = new Date(this.date)
+          this.http.post('/memberAccount/b/addAccount', {
+              merchantId: localStorage.getItem('userId') // 商户ID
+                ,
+              name: this.userName // 姓名
+                ,
+              cellPhoneNumber: this.phone // 手机号
+                ,
+              birthday: newDate.getFullYear() + '-' + (newDate.getMonth() + 1) + '-' + newDate.getDate() // 生日
+                ,
+              gender: this.radio // 性别
+            })
+            .then(res => {
+              console.log(res.data.code);
+              if (res.data.code == 200) {
+                this.$message({
+                  message: '录入用户成功!',
+                  type: 'success'
+                });
+              } else if (res.data.code == 400) {
+                this.$message({
+                  message: res.data.message,
+                  type: 'error'
+                });
+              }
+            })
+        }
+
       }
     }
   }

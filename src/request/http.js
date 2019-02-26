@@ -4,7 +4,7 @@ import {
 } from 'element-ui'; //element库的消息提示，移动端不能自适应
 
 if (process.env.NODE_ENV == 'development') {
-  axios.defaults.baseURL = 'http://192.168.1.218:8181/';
+  axios.defaults.baseURL = 'http://192.168.1.227:8383';
 } else if (process.env.NODE_ENV == 'testing') {    
   axios.defaults.baseURL = 'http://test.bjysjglasses.com:8181/';
 } else if (process.env.NODE_ENV == 'production') {    

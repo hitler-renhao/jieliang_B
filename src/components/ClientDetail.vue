@@ -33,8 +33,8 @@
           </el-table-column>
           <el-table-column prop="name" label="顾客姓名" width="80">
           </el-table-column>
-          <el-table-column prop="phone" label="顾客电话" width="110">
-          </el-table-column>
+          <!-- <el-table-column prop="phone" label="顾客电话" width="110">
+          </el-table-column> -->
           <el-table-column prop="product" label="购买商品" width="">
           </el-table-column>
           <el-table-column prop="optoList" label="验光单" width="70">
@@ -121,10 +121,7 @@
       // 录入验光单
       entering() {
         this.$router.push({
-          path: '/',
-          query: {
-            type: 'edit'
-          }
+          path: '/EnterOptomer',
         })
       },
       view() {
