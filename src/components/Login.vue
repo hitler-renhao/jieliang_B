@@ -22,24 +22,35 @@
       }
     },
     methods: {
-      getSms() {
-        this.http.post('/sms/smsSend', {
-            phone: this.phone,
-            sign: '0'
+      // getSms() {
+      //   this.http.post('/sms/smsSend', {
+      //       phone: this.phone,
+      //       sign: '0'
+      //     })
+      //     .then(res => {
+      //       console.log(res.data.code);
+      //       if (res.data.code == 2000) {
+      //         alert('验证码发送成功, 请注意查收! ')
+      //       } else if (res.data.code == 400 && res.data.msg == '{phone=手机号格式有误！}') {
+      //         alert('手机号格式有误！')
+      //       } else if (res.data.code == 400 && res.data.msg == '{phone=手机号不能为空！}') {
+      //         alert('手机号不能为空！')
+      //       }
+      //     })
+      // },
+      Login() {
+        this.http.post('/merchant/b/login', {
+            userName: this.phone,
+            userPwd: this.password
           })
           .then(res => {
             console.log(res.data.code);
             if (res.data.code == 2000) {
-              alert('验证码发送成功, 请注意查收! ')
-            } else if (res.data.code == 400 && res.data.msg == '{phone=手机号格式有误！}') {
-              alert('手机号格式有误！')
-            } else if (res.data.code == 400 && res.data.msg == '{phone=手机号不能为空！}') {
-              alert('手机号不能为空！')
+              alert(111)
+            } else {
+              alert(res.data.message)
             }
           })
-      },
-      Login() {
-        alert('登录_____' + this.smsCode)
       }
     },
     created() {
@@ -77,6 +88,7 @@
     left: 50%;
     transform: translate(-50%);
   }
+
   input {
     display: block;
     width: 240px;
@@ -87,9 +99,11 @@
     text-align: center;
     margin-bottom: 30px;
   }
+
   ::-webkit-input-placeholder {
     color: #ddd;
   }
+
   button {
     width: 120px;
     height: 36px;

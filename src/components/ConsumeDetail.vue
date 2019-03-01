@@ -56,38 +56,38 @@
             <tbody>
               <tr>
                 <td>R</td>
-                <td> {{ 1 }} </td>
-                <td> {{ 2 }} </td>
-                <td> {{ 3 }} </td>
-                <td> {{ 4 }} </td>
-                <td> {{ 5 }} </td>
-                <td> {{ 6 }} </td>
-                <td rowspan="2"> {{ 7 }} </td>
+                <td> {{ sphR }} </td>
+                <td> {{ cylR }} </td>
+                <td> {{ axiR }} </td>
+                <td> {{ prismR }} </td>
+                <td> {{ base_prismR }} </td>
+                <td> {{ bcvaR }} </td>
+                <td rowspan="2" style="border-bottom: 1px solid #dedede"> {{ pd }} </td>
               </tr>
               <tr>
                 <td>L</td>
-                <td> {{ 1 }} </td>
-                <td> {{ 2 }} </td>
-                <td> {{ 3 }} </td>
-                <td> {{ 4 }} </td>
-                <td> {{ 5 }} </td>
-                <td> {{ 6 }} </td>
-                <td> {{ 7 }} </td>
+                <td> {{ sphL }} </td>
+                <td> {{ cylL }} </td>
+                <td> {{ axiL }} </td>
+                <td> {{ prismL }} </td>
+                <td> {{ base_prismL }} </td>
+                <td> {{ bcvaL }} </td>
+                <!-- <td> {{ pdL }} </td> -->
               </tr>
             </tbody>
           </table>
           <ul>
-            <li class="fl">ADD: {{ }} </li>
-            <li class="fl">渐进片RPD：</li>
-            <li class="fl">LPD: </li>
-            <li class="fl">RPH: </li>
-            <li class="fl">LPH: </li>
-            <li class="fl">焦距: </li>
+            <li class="fl">ADD: {{ add }} </li>
+            <li class="fl">渐进片RPD: {{ rpd }} </li>
+            <li class="fl">LPD: {{ lpd }} </li>
+            <li class="fl">RPH: {{ rph }} </li>
+            <li class="fl">LPH: {{ lph }} </li>
+            <li class="fl">焦距: {{ focalLength }} </li>
           </ul>
         </div>
         <div class="suggest">
           <span>诊断建议: </span>
-          <textarea name="" id="" cols="30" rows="10"></textarea>
+          <textarea name="" id="" cols="30" rows="10"> {{ suggest }} </textarea>
         </div>
         <h3 class="fr" style="margin-right: 5%">验光师: {{ optomertrist }} </h3>
       </div>
@@ -124,12 +124,20 @@
         axiL: '',
         prismR: '',
         prismL: '',
-        base_prism: '',
-        base_prism: '',
-        bcva: '',
-        bcva: '',
+        base_prismR: '',
+        base_prismL: '',
+        bcvaR: '',
+        bcvaL: '',
         pd: '',
-        pd: ''
+
+        add: '',
+        rpd: '',
+        lpd: '',
+        rph: '',
+        lph: '',
+        focalLength: '',
+
+        suggest: '',
       }
     },
     created() {
@@ -147,7 +155,7 @@
         this.http.get('/order/b/queryOrderData', {
             offset: 0,
             size: 111,
-            orderId: 1
+            orderId: 2
           })
           .then(res => {
             if (res.data.code == 200) {
@@ -156,7 +164,7 @@
               // left-top
               var obj = {};
               var prodName, prodNumber, prodPrice;
-              for(var index = 0; index < data.orderdetail.length; index++) {
+              for (var index = 0; index < data.orderdetail.length; index++) {
                 this.product.push(data.orderdetail[index]);
                 this.product[index].purchaseQuantity = this.product[index].purchaseQuantity || 0;
               }
@@ -170,9 +178,37 @@
               this.radio2 = (data.optometryDetail[0].use || 1) + '';
 
               // 表格
+              console.log(data.optometryDetail);
 
-              
-              
+              this.sphR = data.optometryDetail[0].sph.split(',')[0]
+              this.sphL = data.optometryDetail[0].sph.split(',')[1]
+              this.cylR = data.optometryDetail[0].cyl.split(',')[0]
+              this.cylL = data.optometryDetail[0].cyl.split(',')[1]
+              this.axiR = data.optometryDetail[0].axi.split(',')[0]
+              this.axiL = data.optometryDetail[0].axi.split(',')[1]
+              this.prismR = data.optometryDetail[0].prism.split(',')[0]
+              this.prismL = data.optometryDetail[0].prism.split(',')[1]
+              this.base_prismR = data.optometryDetail[0].basePrism.split(',')[0]
+              this.base_prismL = data.optometryDetail[0].basePrism.split(',')[1]
+              this.bcvaR = data.optometryDetail[0].bcva.split(',')[0]
+              this.bcvaL = data.optometryDetail[0].bcva.split(',')[1]
+              this.pd = data.optometryDetail[0].pd
+
+              this.add = data.optometryDetail[0].add
+              this.rpd = data.optometryDetail[0].rpd
+              this.lpd = data.optometryDetail[0].lpd
+              this.rph = data.optometryDetail[0].rph
+              this.lph = data.optometryDetail[0].lph
+              this.focalLength = data.optometryDetail[0].focalLength
+
+              // 诊断建议
+              this.suggest = data.optometry.diagnosticAdvice || '无';
+
+              // 验光师
+              this.optomertrist = data.optometry.optometrist;
+
+
+
 
             } else if (res.data.code == 400) {
               this.$message({
@@ -378,7 +414,7 @@
   }
 
   .right ul li {
-    margin-left: 6%;
+    margin: 0 2%;
     font-family: 'simsun'
   }
 

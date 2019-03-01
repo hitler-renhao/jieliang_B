@@ -59,9 +59,7 @@
       }
     },
     created() {
-      this.type = this.$route.query.type
       this.userId = this.$route.query.userId
-      console.log(this.type);
       console.log(this.userId);
 
       if (this.type == 'edit') {
@@ -80,9 +78,27 @@
     },
     methods: {
       success() {
-        alert('姓名_____' + this.userName + '\n手机号_____' + this.phone + '\n生日_____' + this.date + '\n性别_____' + this.radio)
-        var newDate = new Date(this.date)
-        alert(newDate.getFullYear() + '-' + (newDate.getMonth() + 1) + '-' + newDate.getDate())
+        // alert('姓名_____' + this.userName + '\n手机号_____' + this.phone + '\n生日_____' + this.date + '\n性别_____' + this.radio)
+        // var newDate = new Date(this.date)
+        // alert(newDate.getFullYear() + '-' + (newDate.getMonth() + 1) + '-' + newDate.getDate())
+
+        this.http.get('/order/b/queryOrderData', {
+            offset: 0,
+            size: 111,
+            orderId: 2
+          })
+          .then(res => {
+            if (res.data.code == 200) {
+              let data = res.data.data;
+              
+              
+            } else if (res.data.code == 400) {
+              this.$message({
+                message: res.data.message,
+                type: 'error'
+              });
+            }
+          })
       },
       // 添加商品
       addProd () {
@@ -91,7 +107,7 @@
           prodPrice: '',
           prodNumber: ''
         })
-        alert(this.product.length)
+        console.log(this.product)
       }
     }
   }

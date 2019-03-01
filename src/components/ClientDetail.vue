@@ -132,7 +132,7 @@
                 data.orderDetailList[index].totalPrice = data.orderDetailList[index].totalPrice.toFixed(2);
                 this.tableData.push(data.orderDetailList[index])
               }
-              this.total = data.orderDetailList.length
+              this.total = data.orderDetailList.length;
               console.log(this.tableData);
 
             } else if (res.data.code == 400) {

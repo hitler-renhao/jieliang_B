@@ -81,7 +81,26 @@
       },
       // 查询
       search() {
-        alert(this.client + '_____' + this.iphone)
+        this.http.get('/memberAccount/b/queryAccountByMerchantId', {
+            pageNum: this.pageNum,
+            pageSize: this.pageSize,
+            merchantId: this.merchantId,
+            name: this.client,
+            cellPhoneNumber: this.iphone
+          })
+          .then(res => {
+            // this.total = res.data.data.total
+            let data = res.data.data.data;
+            console.log(data);
+            this.tableData = [];
+              this.tableData.push({
+                number: data[0].serialNumber,
+                name: data[0].name,
+                phone: data[0].cellPhoneNumber,
+                date: data[0].gmtCreate.split(' ')[0],
+                id: data[0].id
+              })
+          })
       },
       // 新增顾客
       add() {
@@ -118,17 +137,18 @@
             merchantId: this.merchantId,
           })
           .then(res => {
-            console.log(res.data.data);
+            
             this.total = res.data.data.total
             let data = res.data.data.data;
+            console.log(data);
             this.tableData = [];
             for (var index = 0; index < this.pageSize; index++) {
               this.tableData.push({
-                number: data[index].serialNumber,
-                name: data[index].name,
-                phone: data[index].cellPhoneNumber,
-                date: data[index].gmtCreate.split(' ')[0],
-                id: data[index].id
+                number: data[index].serialNumber || '',
+                name: data[index].name || '',
+                phone: data[index].cellPhoneNumber || '',
+                date: data[index].gmtCreate.split(' ')[0] || '',
+                id: data[index].id || ''
               })
             }
           })
