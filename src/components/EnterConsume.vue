@@ -166,7 +166,7 @@
   }
 
   input {
-    width: 87%;
+    width: 89%;
     height: 40%;
     border-radius: 20px;
     border: none;

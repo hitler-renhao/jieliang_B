@@ -14,8 +14,8 @@
         <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%; text-align: center; margin-top: 40px">
           <el-table-column type="selection" width="55">
           </el-table-column>
-          <el-table-column label="编号" width="110">
-            <template slot-scope="scope">{{ scope.row.number }}</template>
+          <el-table-column label="编号" width="90" prop="number">
+            <!-- <templ slot-scope="scope">{{ scope.row.number }}</templ ate> -->
           </el-table-column>
           <el-table-column prop="name" label="顾客姓名" width="110">
           </el-table-column>
@@ -23,23 +23,19 @@
           </el-table-column>
           <el-table-column prop="date" label="添加日期" width="">
           </el-table-column>
-          <el-table-column label="操作" show-overflow-tooltip>
-            <button class="operation" @click="edit">编辑资料</button>
-            <button class="operation" @click="view">查看</button>
+          <el-table-column label="操作" show-overflow-tooltip width="80">
+            <button class="operation" slot-scope="scope" @click="edit(scope.row.id)">编辑资料</button>
           </el-table-column>
+          <el-table-column label="" show-overflow-tooltip width="80">
+            <button class="operation" slot-scope="scope" @click="view(scope.row.id)">查看</button>
+          </el-table-column>
+
         </el-table>
         <!-- 分页 -->
         <div class="block">
-          <el-pagination 
-          @current-change="handleCurrentChange" 
-          :current-page.sync="currentPage1" 
-          :pager-count="5"
-          :page-size="5" 
-          layout="total, prev, pager, next, jumper" 
-          :total="total"
-          prev-text="上一页"
-          next-text="下一页"
-          :background=true>
+          <el-pagination @current-change="handleCurrentChange" :current-page.sync="currentPage1" :pager-count="7"
+            :page-size="7" layout="total, prev, pager, next, jumper" :total="total" prev-text="上一页" next-text="下一页"
+            :background=true>
           </el-pagination>
         </div>
       </div>
@@ -58,24 +54,15 @@
         tableData: [],
         multipleSelection: [],
         currentPage1: 1,
-        total: 100
+        total: 100,
+
+        merchantId: 1,
+        pageNum: 1,
+        pageSize: 7,
       }
     },
     created() {
-      // this.http.post('/123', {
-      //   phone: '123'
-      // })
-      // .then( res => {
-      //   console.log();
-      // })
-      for (var index = 0; index < 5; index++) {
-        this.tableData.push({
-          number: 1001,
-          name: '王小虎',
-          phone: '18310215054',
-          date: '2016-05-03',
-        })
-      }
+      this.getClient();
     },
     methods: {
       toggleSelection(rows) {
@@ -89,9 +76,8 @@
       },
       handleCurrentChange(val) {
         console.log(`${val}`);
-        this.http.post('/123', {
-          pageNum: `${val}`,
-        })
+        this.pageNum = val;
+        this.getClient();
       },
       // 查询
       search() {
@@ -107,19 +93,45 @@
         })
       },
       // 编辑资料
-      edit() {
+      edit(id) {
         this.$router.push({
           path: '/EnterClient',
           query: {
             type: 'edit',
-            userId: '123456'
+            userId: id
           }
         })
       },
-      view() {
+      view(id) {
         this.$router.push({
-          path: '/ClientDetail'
+          path: '/ClientDetail',
+          query: {
+            type: 'edit',
+            userId: id
+          }
         })
+      },
+      getClient() {
+        this.http.get('/memberAccount/b/queryAccountByMerchantId', {
+            pageNum: this.pageNum,
+            pageSize: this.pageSize,
+            merchantId: this.merchantId,
+          })
+          .then(res => {
+            console.log(res.data.data);
+            this.total = res.data.data.total
+            let data = res.data.data.data;
+            this.tableData = [];
+            for (var index = 0; index < this.pageSize; index++) {
+              this.tableData.push({
+                number: data[index].serialNumber,
+                name: data[index].name,
+                phone: data[index].cellPhoneNumber,
+                date: data[index].gmtCreate.split(' ')[0],
+                id: data[index].id
+              })
+            }
+          })
       }
     }
   }
@@ -136,24 +148,26 @@
     justify-content: center;
     align-items: center;
   }
-@media screen and (max-width: 1920px) {
+
+  @media screen and (max-width: 1920px) {
     .main {
-    position: relative;
-    width: 62.5%;
-    height: 83.3%;
-    background-color: #fff;
-    border-radius: 18px;
+      position: relative;
+      width: 62.5%;
+      height: 83.3%;
+      background-color: #fff;
+      border-radius: 18px;
+    }
   }
-}
-@media screen and (max-width: 1281px) {
+
+  @media screen and (max-width: 1281px) {
     .main {
-    position: relative;
-    width: 80%;
-    height: 83.3%;
-    background-color: #fff;
-    border-radius: 18px;
+      position: relative;
+      width: 80%;
+      height: 83.3%;
+      background-color: #fff;
+      border-radius: 18px;
+    }
   }
-}
 
   header {
     position: absolute;
@@ -231,12 +245,13 @@
 
   .operation {
     display: block;
-    width: 50%;
+    width: 100%;
     height: 24px;
     margin: 5px;
     box-shadow: none;
     font-size: 12px;
   }
+
   .block {
     margin-top: 10px;
     display: flex;

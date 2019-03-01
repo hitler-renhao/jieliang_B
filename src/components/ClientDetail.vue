@@ -3,17 +3,17 @@
     <div class="main">
       <header>
         <span>顾客姓名: </span>
-        <input v-model="client" type="text" class="phone" placeholder="顾客姓名">
+        <input v-model="client" type="text" class="phone" placeholder="顾客姓名" readonly>
         <span>手机号: </span>
-        <input v-model="iphone" type="text" class="password" placeholder="手机号">
-        <button @click="search" class="btn">修改资料</button>
-        <button @click="search" class="btn">录入消费</button>
+        <input v-model="iphone" type="text" class="password" placeholder="手机号" readonly>
+        <button @click="edit" class="btn">修改资料</button>
+        <button @click="enterConsume" class="btn">录入消费</button>
       </header>
       <div class="nav">
-        <span>生日: </span>
-        <input v-model="client" type="text" class="birthday" placeholder="生日">
+        <span style="margin-left: 1%">生日: </span>
+        <input v-model="birthday" type="text" class="birthday" placeholder="生日" style="width: 18%" readonly>
         <span class="remarks">备注: </span>
-        <input v-model="iphone" type="text" class="remark" placeholder="备注">
+        <input v-model="remark" type="text" class="remark" placeholder="备注" readonly>
       </div>
       <p class="totals">
         <span>消费总次数: </span>
@@ -28,27 +28,31 @@
         <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%;  margin-top: 30px">
           <el-table-column type="selection" width="40">
           </el-table-column>
-          <el-table-column label="编号" width="70">
-            <template slot-scope="scope">{{ scope.row.number }}</template>
+          <el-table-column label="编号" width="160">
+            <template slot-scope="scope">{{ scope.row.transactionNo }}</template>
           </el-table-column>
           <el-table-column prop="name" label="顾客姓名" width="80">
           </el-table-column>
           <!-- <el-table-column prop="phone" label="顾客电话" width="110">
           </el-table-column> -->
-          <el-table-column prop="product" label="购买商品" width="">
+          <el-table-column prop="goodsNames" label="购买商品" width="">
           </el-table-column>
-          <el-table-column prop="optoList" label="验光单" width="70">
+          <el-table-column prop="optometryCount" label="验光单" width="70">
           </el-table-column>
-          <el-table-column prop="consumeMoney" label="消费金额" width="80">
+          <el-table-column prop="totalPrice" label="消费金额" width="80">
           </el-table-column>
-          <el-table-column prop="getPoint" label="所得积分" width="80">
+          <el-table-column prop="point" label="所得积分" width="80">
           </el-table-column>
-          <el-table-column prop="date" label="添加日期" width="100">
+          <el-table-column prop="gmtCreate" label="添加日期" width="100">
           </el-table-column>
-          <el-table-column label="操作" show-overflow-tooltip  width="160">
-            <button class="operation" @click="view">查看</button>
-            <button class="operation" @click="entering">录入验光单</button>
+          <el-table-column label="操作" show-overflow-tooltip width="80">
+            <button class="operation" @click="view(scope.row.id)" slot-scope="scope">查看</button>
           </el-table-column>
+          <el-table-column label="" show-overflow-tooltip width="110">
+            <button class="operation" @click="entering(scope.row.id)" slot-scope="scope">录入验光单</button>
+          </el-table-column>
+
+
         </el-table>
         <!-- 分页 -->
         <div class="block">
@@ -69,34 +73,21 @@
       return {
         client: '',
         iphone: '',
+        birthday: '',
+        remark: '',
         tableData: [],
         multipleSelection: [],
         currentPage1: 1,
         total: 100,
         totalNumber: 999,
         totalMoney: 9999.99,
-        totalPoint: 999
+        totalPoint: 999,
+        userId: 1,
       }
     },
     created() {
-      // this.http.post('/123', {
-      //   phone: '123'
-      // })
-      // .then( res => {
-      //   console.log();
-      // })
-      for (var index = 0; index < 5; index++) {
-        this.tableData.push({
-          number: 1001,
-          name: '王小虎',
-          phone: '18310215054',
-          product: '摩根波士镜架x1蔡司镜片x1摩根波士镜架x1蔡司镜片x1',
-          optoList: '无',
-          consumeMoney: 100,
-          getPoint: 100,
-          date: '2016-05-03',
-        })
-      }
+      this.userId = this.$route.query.userId;
+      this.getUserInfomation();
     },
     methods: {
       toggleSelection(rows) {
@@ -114,9 +105,62 @@
           pageNum: `${val}`,
         })
       },
-      // 查询
-      search() {
-        alert(this.client + '_____' + this.iphone)
+      getUserInfomation() {
+        this.http.get('/memberAccount/accountAllDetails', {
+            offset: 0,
+            size: 111,
+            userAccountId: this.userId
+          })
+          .then(res => {
+            if (res.data.code == 200) {
+              console.log(res);
+              let data = res.data.data;
+              // top
+              this.client = data.accountDetails.name;
+              this.iphone = data.accountDetails.cellPhoneNumber;
+              this.birthday = data.accountDetails.birthday.split(' ')[0];
+              this.remark = data.accountDetails.remark;
+
+              // middle
+              this.totalNumber = data.accountDetails.totalNumberSpending || 0;
+              this.totalMoney = data.accountDetails.totalAmountSpending || 0;
+              this.totalPoint = data.pointDetails.point || 0;
+
+              // bottom
+              for (var index = 0; index < data.orderDetailList.length; index++) {
+                data.orderDetailList[index].gmtCreate = data.orderDetailList[index].gmtCreate.split(' ')[0];
+                data.orderDetailList[index].totalPrice = data.orderDetailList[index].totalPrice.toFixed(2);
+                this.tableData.push(data.orderDetailList[index])
+              }
+              this.total = data.orderDetailList.length
+              console.log(this.tableData);
+
+            } else if (res.data.code == 400) {
+              this.$message({
+                message: res.data.message,
+                type: 'error'
+              });
+            }
+          })
+      },
+      // 修改资料
+      edit() {
+        this.$router.push({
+          path: '/EnterClient',
+          query: {
+            type: 'edit',
+            userId: this.userId
+          }
+        })
+      },
+      // 录入消费
+      enterConsume() {
+        this.$router.push({
+          path: '/EnterConsume',
+          query: {
+            userId: this.userId
+          }
+        })
       },
       // 录入验光单
       entering() {
@@ -124,9 +168,13 @@
           path: '/EnterOptomer',
         })
       },
-      view() {
+      // 查看订单信息
+      view(id) {
         this.$router.push({
-          path: '/ConsumeDetail'
+          path: '/ConsumeDetail',
+          query: {
+            id: id
+          }
         })
       }
     }
@@ -153,6 +201,7 @@
       background-color: #fff;
       border-radius: 18px;
     }
+
     .list {
       height: 72%;
     }
@@ -163,6 +212,7 @@
       width: 80%;
       height: 90.3%;
     }
+
     .list {
       height: 73%;
     }
@@ -188,7 +238,7 @@
     border: none;
     outline: none;
     text-align: center;
-    margin: 0 50px 0 10px;
+    margin: 0 40px 0 10px;
     box-shadow: 0px 0px 6px 0px rgba(122, 122, 122, 0.1),
       /*上边阴影*/
       0px 0px 6px 0px rgba(122, 122, 122, 0.1),
@@ -263,9 +313,9 @@
 
   .operation {
     display: block;
-    width: 70%;
+    width: 100%;
     height: 24px;
-    margin: 5px;
+    margin: 0;
     box-shadow: none;
     font-size: 12px;
   }
@@ -285,16 +335,19 @@
     line-clamp: 2;
     -webkit-box-orient: vertical;
   }
+
   .totals {
     width: 100%;
     position: absolute;
     top: 16%;
     left: 2.5%
   }
+
   .totals span {
     margin-left: 4%;
     font-weight: 100;
   }
+
   .totals b {
     color: #68CFC3;
   }

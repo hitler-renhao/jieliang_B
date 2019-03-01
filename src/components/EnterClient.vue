@@ -2,7 +2,7 @@
   <div class="EnterClient">
     <div class="main">
       <div class="center">
-        <h2>录入客户</h2>
+        <h2> {{ title }} </h2>
         <div class="user">
           <span>顾客姓名 :</span>
           <input v-model="userName" type="text" class="password" placeholder="请输入顾客的姓名">
@@ -23,6 +23,10 @@
             <el-radio v-model="radio" label="2">女</el-radio>
           </div>
         </div>
+        <div class="remark" v-if="this.type == 'edit'">
+          <span>备注: </span>
+          <textarea v-model="remark" placeholder="请输入备注"></textarea>
+        </div>
         <div class="btn">
           <button class="operation" @click="success">完&nbsp;&nbsp;&nbsp;&nbsp;成</button>
         </div>
@@ -36,6 +40,7 @@
     name: 'EnterClient',
     data() {
       return {
+        title: '录入客户',
         pickerOptions1: {
           disabledDate(time) {
             return time.getTime() > Date.now();
@@ -45,7 +50,9 @@
         phone: '',
         date: '',
         radio: '1',
+        remark: '',
         type: '',
+        url: '',
       }
     },
     created() {
@@ -53,28 +60,38 @@
       this.userId = this.$route.query.userId
       console.log(this.type);
       console.log(this.userId);
-
-      if (this.type == 'edit') {
-        // this.http.post('/123', {
-        //   userId: this.userId
-        // })
-        // .then( res => {
-        //   console.log(res);
-        // this.userName = '贾二蛋'
-        // this.phone = '18310215054'
-        // this.date = '2019-02-25'
-        // this.radio = '男'
-        // })
-
-      }
+      this.isEdit();
     },
     methods: {
+      isEdit() {
+        if (this.type == 'edit') {
+          this.title = '编辑用户';
+          this.url = '/memberAccount/b/updateAccount';
+          // 回显
+          this.http.get('/memberAccount/accountDetails', {
+            userId: this.userId
+          })
+          .then( res => {
+            console.log(res.data.data);
+            let data = res.data.data;
+          this.userName = data.name;
+          this.phone = data.cellPhoneNumber;
+          this.date = data.gmtCreate.split(' ')[0]
+          this.radio = data.gender + '';  // 数值转字符串
+          this.remark = data.remark;  // 备注
+          })
+        } else {
+          this.title = '录入客户';
+          this.url = '/memberAccount/b/addAccount';
+        }
+      },
       success() {
-        var pattern = /^(((13[0-9]{1})|(14[0-9]{1})|(15[0-9]{1})|(16[0-9]{1})|(17[0-9]{1})|(18[0-9]{1})|(19[0-9]{1}))+\d{8})$/;
+        var pattern =
+          /^(((13[0-9]{1})|(14[0-9]{1})|(15[0-9]{1})|(16[0-9]{1})|(17[0-9]{1})|(18[0-9]{1})|(19[0-9]{1}))+\d{8})$/;
         console.log(this.userName);
         console.log(this.phone);
         console.log(this.radio);
-        
+
         if (!this.userName || !this.phone || !this.radio) {
           this.$message({
             message: '请将信息填写完整!',
@@ -87,7 +104,7 @@
           });
         } else {
           var newDate = new Date(this.date)
-          this.http.post('/memberAccount/b/addAccount', {
+          this.http.post( this.url, {
               merchantId: localStorage.getItem('userId') // 商户ID
                 ,
               name: this.userName // 姓名
@@ -97,6 +114,10 @@
               birthday: newDate.getFullYear() + '-' + (newDate.getMonth() + 1) + '-' + newDate.getDate() // 生日
                 ,
               gender: this.radio // 性别
+              ,
+              id: this.userId  // 用户ID
+              ,
+              remark: this.remark
             })
             .then(res => {
               console.log(res.data.code);
@@ -133,7 +154,8 @@
 
   .user,
   .phone,
-  .block {
+  .block,
+  .remark {
     height: 10%;
     margin-bottom: 5%;
     position: relative;
@@ -175,7 +197,7 @@
   h2 {
     font-size: 40px;
     text-align: center;
-    margin-bottom: 30%;
+    margin-bottom: 20%;
   }
 
   input {
@@ -276,6 +298,26 @@
   span,
   i {
     color: #888;
+  }
+
+  textarea {
+    width: 70%;
+    height: 180%;
+    float: right;
+    margin: 5% 0;
+    padding: 5%;
+    border-radius: 18px;
+    font-size: 16px;
+    outline: none;
+    resize: none;
+    box-shadow: 0px 0px 6px 0px rgba(122, 122, 122, 0.1),
+      /*上边阴影*/
+      0px 0px 6px 0px rgba(122, 122, 122, 0.1),
+      /*左边阴影*/
+      0px 0px 6px 0px rgba(122, 122, 122, 0.1),
+      /*右边阴影*/
+      0px 0px 6px 0px rgba(122, 122, 122, 0.1);
+    /*下边阴影*/
   }
 
 </style>
